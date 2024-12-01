@@ -2,14 +2,71 @@
 #include <stdlib.h>
 #include <math.h>
 
+#define HASH_SIZE 10000
+
+typedef struct Node{
+    int value;
+    int count;
+    struct Node* next;
+} Node;
 
 int compare(const void *a, const void *b) {
     return (*(int*)a - *(int*)b);
 }
 
+int hash(int value) {
+    return abs(value) % HASH_SIZE;
+}
+
+Node* hash_table[HASH_SIZE] = {NULL};
+
+void increment_count(int value) {
+    int index = hash(value);
+    Node* current = hash_table[index];
+
+    // search for existing value
+    while (current != NULL) {
+        if (current->value == value) {
+            current->count++;
+            return;
+        }
+        current = current->next;
+    }
+    // value not fount 
+    Node* new_node = (Node*)malloc(sizeof(Node));
+    new_node->value = value;
+    new_node->count = 1;
+    new_node->next = hash_table[index];
+    hash_table[index] = new_node;
+}
+
+int get_count(int value) {
+    int index = hash(value);
+    Node* current = hash_table[index];
+
+    while (current != NULL) {
+        if (current->value == value) {
+            return current->count;
+        }
+        current = current->next;
+    }
+    return 0;
+}
+
+void free_hash_table() {
+    for (int i = 0; i < HASH_SIZE; i++) {
+        Node* current = hash_table[i];
+        while (current != NULL) {
+            Node* temp = current;
+            current = current->next;
+            free(temp);
+        }
+    }
+}
+
 int main() {
     FILE *file = fopen("/Users/johanngerberding/github/advent-of-code-2024/problems/day01/input.txt", "r");    
-    int capacity = 10;
+    int capacity = 100;
     int *arr1 = NULL; 
     int *arr2 = NULL; 
     int count = 0; 
@@ -36,7 +93,7 @@ int main() {
             int *temp2 = realloc(arr2, capacity * sizeof(int));
 
             if (temp1 == NULL || temp2 == NULL) {
-                printf("Memory reallocation failed!");
+                printf("Memory reallocation failed!\n");
                 free(arr1);
                 free(arr2);
                 return 1;
@@ -55,8 +112,21 @@ int main() {
         distance += abs(arr1[i] - arr2[i]);
     } 
 
-    printf("Part 1 - Total distance: %d", distance);
+    printf("Part 1 - Total distance: %d\n", distance);
 
+    int similarityScore = 0;
+    for (int i = 0; i < count; i++) {
+        increment_count(arr2[i]);
+    }
+
+    int numberCount = 0;
+    for (int i = 0; i < count; i++) {
+        numberCount = get_count(arr1[i]);
+        similarityScore += (arr1[i] * numberCount); 
+    }
+
+    printf("Part 2 - Similarity score: %d\n", similarityScore);
+    
     // clean up 
     free(arr1);
     free(arr2);
