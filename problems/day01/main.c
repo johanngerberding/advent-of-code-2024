@@ -65,7 +65,7 @@ void free_hash_table() {
 }
 
 int main() {
-    FILE *file = fopen("/Users/johanngerberding/github/advent-of-code-2024/problems/day01/input.txt", "r");    
+    FILE *file = fopen("../input.txt", "r");    
     int capacity = 100;
     int *arr1 = NULL; 
     int *arr2 = NULL; 
