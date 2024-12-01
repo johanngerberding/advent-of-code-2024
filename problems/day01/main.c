@@ -1,5 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+
+
+int compare(const void *a, const void *b) {
+    return (*(int*)a - *(int*)b);
+}
 
 int main() {
     FILE *file = fopen("/Users/johanngerberding/github/advent-of-code-2024/problems/day01/input.txt", "r");    
@@ -41,13 +47,15 @@ int main() {
         }
     }
 
-    // make sure the file reading works
+    qsort(arr1, count, sizeof(int), compare);
+    qsort(arr2, count, sizeof(int), compare);
+    
+    int distance = 0;  
     for (int i = 0; i < count; i++) {
-        printf("arr1[%d]=%d, arr2[%d]=%d\n", i, arr1[i], i, arr2[i]);
-    }
+        distance += abs(arr1[i] - arr2[i]);
+    } 
 
-
-
+    printf("Part 1 - Total distance: %d", distance);
 
     // clean up 
     free(arr1);
