@@ -29,11 +29,11 @@ int countNumbers(char *line) {
     return count;
 }
 
-int validateLine(int **numbers, int row, int cols) {
+int validateLine(int **numbers, int row, int *cols) {
     int direction; 
     int diff = numbers[row][1] - numbers[row][0];
     if (diff == 0) {
-        return -1;
+        return 0;
     } else if (diff > 0){
         // increase 
         direction = 0;
@@ -41,12 +41,14 @@ int validateLine(int **numbers, int row, int cols) {
         // decrease
         direction = 1;
     }
-    for (int i = 1; i < cols; i++) {
+    int num_cols = cols[row];
+    for (int i = 1; i < num_cols; i++) {
         int diff = numbers[row][i] - numbers[row][i - 1];
+        printf("Diff: %d\n", diff);
         if (direction == 0) {
-            if (diff <= 0 || diff > 2) return 0; 
+            if (diff <= 0 || diff > 3) return 0; 
         } else {
-            if (diff >= 0 || diff < -2) return 0;
+            if (diff >= 0 || diff < -3) return 0;
         } 
     }  
     return 1;
@@ -54,7 +56,7 @@ int validateLine(int **numbers, int row, int cols) {
 
 
 int main() {
-    FILE *file = fopen("./input.txt", "r");
+    FILE *file = fopen("../input.txt", "r");
     
     if (file == NULL) {
         printf("Cannot open file.");
@@ -93,14 +95,16 @@ int main() {
 
     
     int valid;
+    int safes = 0; 
     // now do stuff
     for (int i = 0; i < rows; i++) {
         valid = validateLine(numbers, i, cols);
         if (valid) {
-            printf("Line %d is valid", i);
+            printf("Line %d is safe\n", i);
+            safes++;
         }
     }
-
+    printf("Part 1: Number of safe lines is %d", safes);
     // free memory
     for (int i = 0; i < rows; i++) {
         free(numbers[i]);
