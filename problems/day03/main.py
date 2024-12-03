@@ -37,7 +37,6 @@ matches_enablers = sorted(matches_do, key=lambda x: x[1])
 ranges = []
 enabled = True
 start = 0
-print(matches_enablers)
 for i in range(len(matches_enablers)):
     if enabled:
         if matches_enablers[i][0] == "do()":
