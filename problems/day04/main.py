@@ -21,27 +21,14 @@ def generate_diags(rows: list) -> list:
             val += rows[row][col]
             row += 1
             col += 1
-            if row >= len(rows):
+            if row >= len(rows) or row < 0:
                 break
-            if col >= len(rows[0]):
+            if col >= len(rows[0]) or col < 0:
                 break
         diagonals.append(val)
 
-    for col in range(len(rows[0])):
+    for col in range(1, len(rows[0])):
         row = 0
-        val = ""
-        while True:
-            val += rows[row][col]
-            row += 1
-            col += 1
-            if row >= len(rows):
-                break
-            if col >= len(rows[0]):
-                break
-        diagonals.append(val)
-
-    for row in range(len(rows) - 1, 0, -1):
-        col = 0
         val = ""
         while True:
             val += rows[row][col]
@@ -53,13 +40,26 @@ def generate_diags(rows: list) -> list:
                 break
         diagonals.append(val)
 
-    for col in range(len(rows[0]) - 1, 0, -1):
+    for row in range(len(rows)):
+        col = len(rows[0]) - 1
+        val = ""
+        while True:
+            val += rows[row][col]
+            row += 1
+            col -= 1
+            if row >= len(rows) or row < 0:
+                break
+            if col >= len(rows[0]) or col < 0:
+                break
+        diagonals.append(val)
+
+    for col in range(len(rows[0]) - 2, 0, -1):
         row = 0
         val = ""
         while True:
             val += rows[row][col]
             row += 1
-            col += 1
+            col -= 1
             if row >= len(rows) or row < 0:
                 break
             if col >= len(rows[0]) or col < 0:
