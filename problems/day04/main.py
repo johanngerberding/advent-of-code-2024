@@ -85,6 +85,25 @@ def find(rows: list, part: str):
     print(f"{part}: {result}")
 
 
+def check(row: int, col: int, rows: list) -> bool:
+    """Check if neighbors form XMAS"""
+    if row > 0 and col > 0 and row < (len(rows) - 1) and col < (len(rows[0]) - 1):
+        neighbors = (
+            rows[row - 1][col - 1]
+            + rows[row - 1][col + 1]
+            + rows[row + 1][col - 1]
+            + rows[row + 1][col + 1]
+        )
+        if (
+            neighbors == "MSMS"
+            or neighbors == "MMSS"
+            or neighbors == "SMSM"
+            or neighbors == "SSMM"
+        ):
+            return True
+    return False
+
+
 pattern = r"XMAS"
 pattern_back = r"SAMX"
 
@@ -92,6 +111,7 @@ with open("input.txt", "r") as fp:
     rows = fp.readlines()
 
 rows = [row.strip() for row in rows]
+rows_part2 = [row.strip() for row in rows]
 
 test = """MMMSXXMASM
 MSAMXMSMSA
@@ -108,3 +128,12 @@ test = test.split()
 
 find(test, "Test")
 find(rows, "Part 1")
+
+part2 = 0
+for row in range(len(rows_part2)):
+    for col in range(len(rows_part2[row])):
+        if rows_part2[row][col] == "A":
+            if check(row, col, rows_part2):
+                part2 += 1
+
+print(f"Part 2: {part2}")
