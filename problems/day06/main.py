@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 with open("input.txt", "r") as fp:
     inp = fp.readlines()
 
@@ -15,6 +17,8 @@ inp = [el.strip() for el in inp]
 # ......#..."""
 # inp = inp.split()
 
+incrementers = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+
 
 class Simulation:
     def __init__(
@@ -25,8 +29,8 @@ class Simulation:
         visited: set | None = None,
     ):
         self.inp = inp
+        self.obs = 0
         self.curr_dir = curr_dir
-        self.incrementers = [(-1, 0), (0, 1), (1, 0), (0, -1)]
         if not current:
             self._get_start()
         else:
@@ -43,7 +47,7 @@ class Simulation:
                     self.current = (row, col, self.curr_dir)
                     return
 
-    def _step(self):
+    def _step(self, part2=False):
         next_position = self._get_next()
         if not self._inside(next_position):
             # we are done
@@ -56,6 +60,9 @@ class Simulation:
 
         # set new position
         self.current = next_position
+        if part2 and self.current in self.visited:
+            self.obs += 1
+            return False
         self.visited.add(self.current)
         return True
 
@@ -78,8 +85,9 @@ class Simulation:
 
     def _get_next(self) -> tuple:
         return (
-            self.current[0] + self.incrementers[self.curr_dir][0],
-            self.current[1] + self.incrementers[self.curr_dir][1],
+            self.current[0] + incrementers[self.curr_dir][0],
+            self.current[1] + incrementers[self.curr_dir][1],
+            self.curr_dir,
         )
 
 
@@ -88,19 +96,25 @@ part1.simulate()
 print(f"Part 1: {len(set([(el[0], el[1]) for el in part1.visited]))}")
 
 obs = 0
-part2 = Simulation(inp=inp)
-while part2._step():
-    start = part2.current  # now I need a switch to the right
-    direction = part2.curr_dir
-    if direction > 3:
-        direction = 0
-    start = (start[0], start[1], direction)
-    visited = part2.visited
-    visited.add(start)
-    subsim = Simulation(inp=inp, curr_dir=direction, current=start, visited=visited)
-    while subsim._step():
-        if subsim.current in subsim.visited:
-            obs += 1
-            break
+c = 0
+for i in range(len(inp)):
+    for j in range(len(inp[0])):
+        modified_input = deepcopy(inp)
+        if modified_input[i][j] == "#" or modified_input[i][j] == "^":
+            continue
+        c += 1
+        print(c)
+        modified_line = list(deepcopy(modified_input[i]))
+        modified_line[j] = "#"
+        modified_line = "".join(modified_line)
+        modified_input[i] = modified_line
+
+        subsim = Simulation(inp=modified_input)
+        while subsim._step(part2=True):
+            continue
+        obs += subsim.obs
+        del subsim
+        del modified_input
+
 
 print(obs)
