@@ -3,21 +3,24 @@ import itertools
 import tqdm
 
 
-def evaluate(numbers: list, ops: list, max_result: int):
+def evaluate(numbers: list, ops: list, target: int):
     """Eval from left to right without precedence rules"""
     result = numbers[0]
-    idx = 1
-    for o in ops:
-        if str(o) == "&":
-            result = int(str(result) + str(numbers[idx]))
+    if result > target:
+        return False
+
+    for i, op in enumerate(ops[:-1]):
+        if op == "&":
+            result = int(str(result) + str(numbers[i + 1]))
+        elif op == "+":
+            result += numbers[i + 1]
         else:
-            result = eval(str(result) + str(o) + str(numbers[idx]))
-        idx += 1
-        if result > max_result:
+            result *= numbers[i + 1]
+
+        if result > target:
             return False
-        if idx >= len(numbers):
-            break
-    return result == max_result
+
+    return result == target
 
 
 with open("input.txt", "r") as fp:
@@ -39,14 +42,18 @@ inp = [el.split(":") for el in inp]
 # example = example.split("\n")
 # inp = [el.split(":") for el in example]
 
+ops_cache = {}
 calibration_result = 0
 for sample in tqdm.tqdm(inp):
     assert len(sample) == 2
     result = int(sample[0])
-    numbers = [int(el) for el in sample[1].split(" ") if el != ""]
-    ops = list(set(list(itertools.product("*+&", repeat=len(numbers) - 1))))
-    found = False
-    for op in ops:
+    numbers = [int(el) for el in sample[1].split(" ") if el]
+
+    num_ops = len(numbers) - 1
+    if num_ops not in ops_cache:
+        ops_cache[num_ops] = list(itertools.product("*+&", repeat=num_ops))
+
+    for op in ops_cache[num_ops]:
         _ops = list(op)
         _ops.append("")
         if evaluate(numbers, _ops, result):
