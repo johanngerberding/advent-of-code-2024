@@ -70,15 +70,48 @@ class Frequency:
 
             antidote1 = Position(comb[0] + dir1)
             antidote2 = Position(comb[1] + dir2)
-            if antidote1 not in self.positions:
+            if antidote1 not in self.positions and antidote1.isinside(
+                self.rows, self.cols
+            ):
+                self.antidotes.add(antidote1)
+            if antidote2 not in self.positions and antidote2.isinside(
+                self.rows, self.cols
+            ):
+                self.antidotes.add(antidote2)
+
+    def find_antidotes2(self):
+        if len(self.antidotes) > 0:
+            self.antidotes = set()
+        if len(self.positions) <= 1:
+            return
+
+        combs = list(itertools.combinations(self.positions, 2))
+
+        for comb in combs:
+            dir1 = comb[0] - comb[1]
+            dir2 = comb[1] - comb[0]
+
+            curr_pos1 = Position(comb[0].row, comb[0].col)
+            # move in dir 1 until out of bounds
+            while True:
+                antidote1 = Position(curr_pos1 + dir1)
                 if antidote1.isinside(self.rows, self.cols):
                     self.antidotes.add(antidote1)
-            if antidote2 not in self.positions:
+                    curr_pos1 = Position(antidote1.row, antidote1.col)
+                else:
+                    break
+            curr_pos2 = Position(comb[1].row, comb[1].col)
+            # move in dir 2 until out of bounds
+            while True:
+                antidote2 = Position(curr_pos2 + dir2)
                 if antidote2.isinside(self.rows, self.cols):
                     self.antidotes.add(antidote2)
+                    curr_pos2 = Position(antidote2.row, antidote2.col)
+                else:
+                    break
 
 
-def part1(inp):
+def solve(inp, part2=False):
     frequencies = {}
 
     for row in range(len(inp)):
@@ -94,36 +127,31 @@ def part1(inp):
 
     antidotes = set()
     for value, frequency in frequencies.items():
-        frequency.find_antidotes()
+        if part2:
+            frequency.find_antidotes2()
+        else:
+            frequency.find_antidotes()
         for antidote in frequency.antidotes:
-            if inp[antidote.row][antidote.col] != value:
-                antidotes.add((antidote.row, antidote.col))
+            if part2:
+                for pos in frequency.positions:
+                    antidotes.add(pos)
+                antidotes.add(Position(antidote.row, antidote.col))
+            else:
+                if inp[antidote.row][antidote.col] != value:
+                    antidotes.add(Position(antidote.row, antidote.col))
 
-    print(f"Part 1: {len(antidotes)}")
+    if part2:
+        print(f"Part 2: {len(antidotes)}")
+    else:
+        print(f"Part 1: {len(antidotes)}")
 
 
 def main():
-    example = """............
-........0...
-.....0......
-.......0....
-....0.......
-......A.....
-............
-............
-........A...
-.........A..
-............
-............"""
-
-    example = example.split("\n")
-    print(example)
-    part1(inp=example)
-
     with open("input.txt", "r") as fp:
         inp = [line.strip() for line in fp]
 
-    part1(inp=inp)
+    solve(inp=inp)
+    solve(inp=inp, part2=True)
 
 
 if __name__ == "__main__":
