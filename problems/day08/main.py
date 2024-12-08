@@ -78,25 +78,6 @@ class Frequency:
                     self.antidotes.add(antidote2)
 
 
-with open("input.txt", "r") as fp:
-    inp = [line.strip() for line in fp]
-
-# inp = """............
-# ........0...
-# .....0......
-# .......0....
-# ....0.......
-# ......A.....
-# ............
-# ............
-# ........A...
-# .........A..
-# ............
-# ............"""
-
-# inp = inp.split("\n")
-
-
 def part1(inp):
     frequencies = {}
 
@@ -111,14 +92,39 @@ def part1(inp):
                 else:
                     frequencies[c].add_position(Position(row, col))
 
-    number_of_antidotes = 0
-    for _, frequency in frequencies.items():
+    antidotes = set()
+    for value, frequency in frequencies.items():
         frequency.find_antidotes()
         for antidote in frequency.antidotes:
-            if inp[antidote.row][antidote.col] == ".":
-                number_of_antidotes += 1
+            if inp[antidote.row][antidote.col] != value:
+                antidotes.add((antidote.row, antidote.col))
 
-    print(f"Part 1: {number_of_antidotes}")
+    print(f"Part 1: {len(antidotes)}")
 
 
-part1(inp=inp)
+def main():
+    example = """............
+........0...
+.....0......
+.......0....
+....0.......
+......A.....
+............
+............
+........A...
+.........A..
+............
+............"""
+
+    example = example.split("\n")
+    print(example)
+    part1(inp=example)
+
+    with open("input.txt", "r") as fp:
+        inp = [line.strip() for line in fp]
+
+    part1(inp=inp)
+
+
+if __name__ == "__main__":
+    main()
