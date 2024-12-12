@@ -1,3 +1,5 @@
+from collections import Counter
+
 example = "125 17"
 
 example = [int(el) for el in example.split(" ")]
@@ -5,18 +7,22 @@ example = [int(el) for el in example.split(" ")]
 with open("input.txt", "r") as fp:
     example = [int(el) for el in fp.read().split(" ")]
 
+samples = Counter(example)
 
-for _ in range(25):
-    temp = []
-    for el in example:
+for i in range(75):
+    temp = Counter()
+    for el, count in samples.items():
         if el == 0:
-            temp.append(1)
+            temp[1] += count
         elif len(str(el)) % 2 == 0:
             split = len(str(el)) // 2
-            temp.append(int(str(el)[:split]))
-            temp.append(int(str(el)[split:]))
+            nums = [int(str(el)[:split]), int(str(el)[split:])]
+            temp[nums[0]] += count
+            temp[nums[1]] += count
         else:
-            temp.append(el * 2024)
-    example = temp
+            temp[el * 2024] += count
+    samples = temp
 
-print(len(example))
+
+stones = sum(count for _, count in samples.items())
+print(f"Part 2: {stones}")
