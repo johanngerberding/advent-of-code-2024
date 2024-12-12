@@ -49,9 +49,12 @@ def bfs(graph: dict, start: tuple, path=[]):
 
 
 score = 0
+score2 = 0
 for start in starts:
     paths = bfs(graph, start)
+    score2 += len(paths)
     reachable_nines = set([p[-1] for p in paths])
     score += len(reachable_nines)
 
-print(score)
+print(f"Part 1: {score}")
+print(f"Part 2: {score2}")
