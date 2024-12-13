@@ -12,8 +12,8 @@ MMMISSJEEE"""
 
 example = example.split("\n")
 
-with open("input.txt", "r") as fp:
-    example = [el.strip() for el in fp]
+# with open("input.txt", "r") as fp:
+#     example = [el.strip() for el in fp]
 
 areas = {}
 
@@ -81,10 +81,63 @@ def fence(area: set, nodes: set) -> int:
     return fence * len(area)
 
 
-result = 0
+def sides(area: set) -> int:
+    sides = 0
+    # get all left elements
+    lefts = {}
+    for node in area:
+        if node[0] in lefts:
+            if node[1] < lefts[node[0]]:
+                lefts[node[0]] = node[1]
+        else:
+            lefts[node[0]] = node[1]
+
+    sides += len(set(v for _, v in lefts.items()))
+
+    rights = {}
+    for node in area:
+        if node[0] in rights:
+            if node[1] > rights[node[0]]:
+                rights[node[0]] = node[1]
+        else:
+            rights[node[0]] = node[1]
+
+    sides += len(set(v for _, v in rights.items()))
+
+    ups = {}
+    for node in area:
+        if node[1] in ups:
+            if node[0] < ups[node[1]]:
+                ups[node[1]] = node[0]
+        else:
+            ups[node[1]] = node[0]
+
+    sides += len(set(v for _, v in ups.items()))
+
+    downs = {}
+    for node in area:
+        if node[1] in downs:
+            if node[0] > downs[node[1]]:
+                downs[node[1]] = node[0]
+        else:
+            downs[node[1]] = node[0]
+
+    sides += len(set(v for _, v in downs.items()))
+
+    return sides * len(area)
+
+
+part1 = 0
+part2 = 0
 for letter, area in separated_areas.items():
+    print(f"------ {letter} ------")
     for a in area:
         r = fence(a, all_nodes)
-        result += r
+        part1 += r
+        s = sides(a)
+        print(letter, s)
+        part2 += s
 
-print(result)
+
+print(f"Part 1: {part1}")
+print(f"Part 2: {part2}")
