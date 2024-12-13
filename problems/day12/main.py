@@ -12,6 +12,9 @@ MMMISSJEEE"""
 
 example = example.split("\n")
 
+with open("input.txt", "r") as fp:
+    example = [el.strip() for el in fp]
+
 areas = {}
 
 for i in range(len(example)):
@@ -62,17 +65,19 @@ for letter, nodes in areas.items():
 def fence(area: set, nodes: set) -> int:
     fence = 0
     for node in area:
+        per_node_fence = 0
         neighbors = [
             (node[0] - 1, node[1]),
             (node[0] + 1, node[1]),
-            (curr[0], curr[1] - 1),
-            (curr[0], curr[1] + 1),
+            (node[0], node[1] - 1),
+            (node[0], node[1] + 1),
         ]
         for neighbor in neighbors:
             if neighbor not in nodes:
-                fence += 1
+                per_node_fence += 1
             elif neighbor not in area:
-                fence += 1
+                per_node_fence += 1
+        fence += per_node_fence
     return fence * len(area)
 
 
@@ -80,7 +85,6 @@ result = 0
 for letter, area in separated_areas.items():
     for a in area:
         r = fence(a, all_nodes)
-        print(letter, r)
         result += r
 
 print(result)
