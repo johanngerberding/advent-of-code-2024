@@ -14,8 +14,8 @@ MMMISSJEEE"""
 
 example = example.split("\n")
 
-# with open("input.txt", "r") as fp:
-#     example = [el.strip() for el in fp]
+with open("input.txt", "r") as fp:
+    example = [el.strip() for el in fp]
 
 areas = {}
 
@@ -90,33 +90,37 @@ def sides(area: set) -> int:
     min_col = min([node[1] for node in area])
     max_col = max([node[1] for node in area])
 
-    for r in range(min_row, max_row):
+    for r in range(min_row, max_row + 1):
         ns = [
             node for node in area if node[0] == r and (node[0] - 1, node[1]) not in area
         ]
         if len(ns) > 0:
-            sides += len(list(consecutive_groups([n[1] for n in ns])))
+            down = len(list(consecutive_groups(sorted([n[1] for n in ns]))))
+            sides += down
 
-    for r in range(min_row, max_row):
+    for r in range(min_row, max_row + 1):
         ns = [
             node for node in area if node[0] == r and (node[0] + 1, node[1]) not in area
         ]
         if len(ns) > 0:
-            sides += len(list(consecutive_groups([n[1] for n in ns])))
+            up = len(list(consecutive_groups(sorted([n[1] for n in ns]))))
+            sides += up
 
-    for c in range(min_col, max_col):
+    for c in range(min_col, max_col + 1):
         ns = [
             node for node in area if node[1] == c and (node[0], node[1] - 1) not in area
         ]
         if len(ns) > 0:
-            sides += len(list(consecutive_groups([n[0] for n in ns])))
+            right = len(list(consecutive_groups(sorted([n[0] for n in ns]))))
+            sides += right
 
-    for c in range(min_col, max_col):
+    for c in range(min_col, max_col + 1):
         ns = [
             node for node in area if node[1] == c and (node[0], node[1] + 1) not in area
         ]
         if len(ns) > 0:
-            sides += len(list(consecutive_groups([n[0] for n in ns])))
+            left = len(list(consecutive_groups(sorted([n[0] for n in ns]))))
+            sides += left
 
     return sides * len(area)
 
