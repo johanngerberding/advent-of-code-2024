@@ -1,3 +1,5 @@
+from more_itertools import consecutive_groups
+
 example = """RRRRIICCFF
 RRRRIICCCF
 VVRRRCCFFF
@@ -83,46 +85,38 @@ def fence(area: set, nodes: set) -> int:
 
 def sides(area: set) -> int:
     sides = 0
-    # get all left elements
-    lefts = {}
-    for node in area:
-        if node[0] in lefts:
-            if node[1] < lefts[node[0]]:
-                lefts[node[0]] = node[1]
-        else:
-            lefts[node[0]] = node[1]
+    min_row = min([node[0] for node in area])
+    max_row = max([node[0] for node in area])
+    min_col = min([node[1] for node in area])
+    max_col = max([node[1] for node in area])
 
-    sides += len(set(v for _, v in lefts.items()))
+    for r in range(min_row, max_row):
+        ns = [
+            node for node in area if node[0] == r and (node[0] - 1, node[1]) not in area
+        ]
+        if len(ns) > 0:
+            sides += len(list(consecutive_groups([n[1] for n in ns])))
 
-    rights = {}
-    for node in area:
-        if node[0] in rights:
-            if node[1] > rights[node[0]]:
-                rights[node[0]] = node[1]
-        else:
-            rights[node[0]] = node[1]
+    for r in range(min_row, max_row):
+        ns = [
+            node for node in area if node[0] == r and (node[0] + 1, node[1]) not in area
+        ]
+        if len(ns) > 0:
+            sides += len(list(consecutive_groups([n[1] for n in ns])))
 
-    sides += len(set(v for _, v in rights.items()))
+    for c in range(min_col, max_col):
+        ns = [
+            node for node in area if node[1] == c and (node[0], node[1] - 1) not in area
+        ]
+        if len(ns) > 0:
+            sides += len(list(consecutive_groups([n[0] for n in ns])))
 
-    ups = {}
-    for node in area:
-        if node[1] in ups:
-            if node[0] < ups[node[1]]:
-                ups[node[1]] = node[0]
-        else:
-            ups[node[1]] = node[0]
-
-    sides += len(set(v for _, v in ups.items()))
-
-    downs = {}
-    for node in area:
-        if node[1] in downs:
-            if node[0] > downs[node[1]]:
-                downs[node[1]] = node[0]
-        else:
-            downs[node[1]] = node[0]
-
-    sides += len(set(v for _, v in downs.items()))
+    for c in range(min_col, max_col):
+        ns = [
+            node for node in area if node[1] == c and (node[0], node[1] + 1) not in area
+        ]
+        if len(ns) > 0:
+            sides += len(list(consecutive_groups([n[0] for n in ns])))
 
     return sides * len(area)
 
