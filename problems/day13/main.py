@@ -1,5 +1,3 @@
-import numpy as np
-
 example = """Button A: X+94, Y+34
 Button B: X+22, Y+67
 Prize: X=8400, Y=5400
@@ -36,16 +34,21 @@ for claw in example:
     ]
     claws.append((button_a, button_b, prize))
 
-
 cost = 0
+print(f"Number of claws: {len(claws)}")
 for claw in claws:
     system = [[[claw[0][0], claw[1][0]], [claw[0][1], claw[1][1]]], claw[2]]
-    res = np.linalg.solve(system[0], system[1])
-    if not int(res[0]) * claw[0][0] + int(res[1]) * claw[1][0] == claw[2][0]:
-        continue
-    if not int(res[0]) * claw[0][1] + int(res[1]) * claw[1][1] == claw[2][1]:
-        continue
-    print(f"{system[1]} -> {res}")
-    cost += res[0] * A + res[1] * B
+    results = []
+    for i in range(101):
+        mod1 = (system[1][0] - i * system[0][0][0]) % system[0][0][1]
+        mod2 = (system[1][1] - i * system[0][1][0]) % system[0][1][1]
+        if mod1 == 0 and mod2 == 0:
+            bs = (system[1][0] - i * system[0][0][0]) / system[0][0][1]
+            results.append((i, bs))
+    results = [res for res in results if res[1] >= 0 and res[1] <= 100]
+    costs = [res[0] * A + res[1] * B for res in results]
+
+    if len(costs) > 0:
+        cost += min(costs)
 
 print(cost)
