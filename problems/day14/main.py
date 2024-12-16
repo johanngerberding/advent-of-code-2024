@@ -2,13 +2,36 @@ import math
 import re
 
 
-def solve(inp: list, max_x: int = 101, max_y: int = 103):
+def plot(robots: list, max_x: int = 101, max_y: int = 103):
+    robots = [robot[:2] for robot in robots]
+    rows = []
+    for x in range(max_x):
+        row = ""
+        for y in range(max_y):
+            if (x, y) in robots:
+                row += "#"
+            else:
+                row += "."
+        rows.append(row)
+    for row in rows:
+        print(row)
+
+
+def solve(inp: list, max_x: int = 101, max_y: int = 103, steps: int = 100):
+    cache = set()
     robots = []
     for line in inp:
         px, py, vx, vy = map(int, re.findall(r"-?\d+", line))
         robots.append((px, py, vx, vy))
 
-    for t in range(100):
+    for t in range(steps):
+        rst = ",".join(str(robot) for robot in robots)
+        if rst not in cache:
+            cache.add(rst)
+        else:
+            print(f"---------- {t} -----------")
+            plot(robots)
+            return
         for i in range(len(robots)):
             # print(t, robots[i])
             px, py, vx, vy = robots[i]
@@ -42,21 +65,21 @@ def solve(inp: list, max_x: int = 101, max_y: int = 103):
 with open("input.txt", "r") as fp:
     lines = fp.read().split("\n")
 
-print(solve(lines))
+print(solve(lines, 101, 103, 100000))
 
-example = """p=0,4 v=3,-3
-p=6,3 v=-1,-3
-p=10,3 v=-1,2
-p=2,0 v=2,-1
-p=0,0 v=1,3
-p=3,0 v=-2,-2
-p=7,6 v=-1,-3
-p=3,0 v=-1,-2
-p=9,3 v=2,3
-p=7,3 v=-1,2
-p=2,4 v=2,-3
-p=9,5 v=-3,-3"""
+# example = """p=0,4 v=3,-3
+# p=6,3 v=-1,-3
+# p=10,3 v=-1,2
+# p=2,0 v=2,-1
+# p=0,0 v=1,3
+# p=3,0 v=-2,-2
+# p=7,6 v=-1,-3
+# p=3,0 v=-1,-2
+# p=9,3 v=2,3
+# p=7,3 v=-1,2
+# p=2,4 v=2,-3
+# p=9,5 v=-3,-3"""
 
-example = example.split("\n")
+# example = example.split("\n")
 
-print(solve(example, max_x=11, max_y=7))
+# print(solve(example, max_x=11, max_y=7))
