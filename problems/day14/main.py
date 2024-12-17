@@ -18,20 +18,14 @@ def plot(robots: list, max_x: int = 101, max_y: int = 103):
 
 
 def solve(inp: list, max_x: int = 101, max_y: int = 103, steps: int = 100):
-    cache = set()
+    min_sf = float("inf")
+    best_iteration = None
     robots = []
     for line in inp:
         px, py, vx, vy = map(int, re.findall(r"-?\d+", line))
         robots.append((px, py, vx, vy))
 
     for t in range(steps):
-        rst = ",".join(str(robot) for robot in robots)
-        if rst not in cache:
-            cache.add(rst)
-        else:
-            print(f"---------- {t} -----------")
-            plot(robots)
-            return
         for i in range(len(robots)):
             # print(t, robots[i])
             px, py, vx, vy = robots[i]
@@ -48,24 +42,32 @@ def solve(inp: list, max_x: int = 101, max_y: int = 103, steps: int = 100):
             robots[i] = (npx, npy, vx, vy)
             # break
 
-    quadrants = [0, 0, 0, 0]
-    for robot in robots:
-        if robot[0] < max_x // 2 and robot[1] < max_y // 2:
-            quadrants[0] += 1
-        elif robot[0] > max_x // 2 and robot[1] < max_y // 2:
-            quadrants[1] += 1
-        elif robot[0] < max_x // 2 and robot[1] > max_y // 2:
-            quadrants[2] += 1
-        elif robot[0] > max_x // 2 and robot[1] > max_y // 2:
-            quadrants[3] += 1
+        quadrants = [0, 0, 0, 0]
+        for robot in robots:
+            if robot[0] < max_x // 2 and robot[1] < max_y // 2:
+                quadrants[0] += 1
+            elif robot[0] > max_x // 2 and robot[1] < max_y // 2:
+                quadrants[1] += 1
+            elif robot[0] < max_x // 2 and robot[1] > max_y // 2:
+                quadrants[2] += 1
+            elif robot[0] > max_x // 2 and robot[1] > max_y // 2:
+                quadrants[3] += 1
 
-    return math.prod(quadrants)
+        sf = math.prod(quadrants)
+        if sf < min_sf:
+            min_sf = sf
+            best_iteration = t
+            print(50 * "-")
+            plot(robots)
+
+    print(best_iteration)
+    return sf
 
 
 with open("input.txt", "r") as fp:
     lines = fp.read().split("\n")
 
-print(solve(lines, 101, 103, 100000))
+print(solve(lines, 101, 103, 101 * 103))
 
 # example = """p=0,4 v=3,-3
 # p=6,3 v=-1,-3
