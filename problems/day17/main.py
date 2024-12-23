@@ -18,8 +18,8 @@ def parse(inp) -> tuple:
 output = []
 
 
-def operand2literal(operand: int, registers: list) -> int:
-    if operand <= 3:
+def combo(operand: int, registers: list) -> int:
+    if 0 <= operand <= 3:
         return operand
     if operand == 4:
         return registers[0]
@@ -34,32 +34,30 @@ def operand2literal(operand: int, registers: list) -> int:
 
 def exec(program: list, inst_pointer: int, registers: list) -> int:
     instruction, operand = program[inst_pointer]
-    operand = operand2literal(operand, registers)
     if instruction == 0:
-        registers[0] = int(registers[0] / 2**operand)
+        registers[0] = registers[0] >> combo(operand, registers)
         return inst_pointer + 1
     elif instruction == 1:
         registers[1] = registers[1] ^ operand
         return inst_pointer + 1
     elif instruction == 2:
-        registers[1] = operand % 8
+        registers[1] = combo(operand, registers) % 8
         return inst_pointer + 1
     elif instruction == 3:
         if registers[0] == 0:
             return inst_pointer + 1
-        print(f"lets jump to {operand}")
         return operand
     elif instruction == 4:
         registers[1] = registers[1] ^ registers[2]
         return inst_pointer + 1
     elif instruction == 5:
-        output.append(operand % 8)
+        output.append(combo(operand, registers) % 8)
         return inst_pointer + 1
     elif instruction == 6:
-        registers[1] = int(registers[0] / 2**operand)
+        registers[1] = registers[0] >> combo(operand, registers)
         return inst_pointer + 1
     elif instruction == 7:
-        registers[2] = int(registers[0] / 2**operand)
+        registers[2] = registers[0] >> combo(operand, registers)
         return inst_pointer + 1
     raise ValueError(
         f"This instruction {instruction} is not part of the instruction set"
@@ -80,6 +78,17 @@ while instruction_pointer < len(program):
 print(output)
 print(",".join([str(el) for el in output]))
 
+
+# 0 Test
+output = []
+instruction_pointer = 0
+registers = [729, 0, 0]
+program = [(0, 1), (5, 4), (3, 0)]
+
+while instruction_pointer < len(program):
+    instruction_pointer = exec(program, instruction_pointer, registers)
+
+print(output)
 
 # 1 Test
 output = []
