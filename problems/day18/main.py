@@ -32,54 +32,64 @@ print(example)
 with open("input.txt", "r") as fp:
     data = [[int(el) for el in line.strip().split(",")] for line in fp]
 
-data = data[:1024]
+# data = data[:1024]
 
 start = (0, 0)
 end = (max([el[0] for el in data]), max([el[1] for el in data]))
 
 
-graph = {}
+def generate_graph(data: list) -> dict:
+    graph = {}
+    for row in range(end[0] + 1):
+        for col in range(end[1] + 1):
+            if [row, col] in data:
+                continue
+            adjs = []
+            if row - 1 >= 0 and [row - 1, col] not in data:
+                adjs.append((row - 1, col))
+            if row + 1 <= end[0] and [row + 1, col] not in data:
+                adjs.append((row + 1, col))
+            if col + 1 <= end[1] and [row, col + 1] not in data:
+                adjs.append((row, col + 1))
+            if col - 1 >= 0 and [row, col - 1] not in data:
+                adjs.append((row, col - 1))
+            graph[(row, col)] = adjs
+    return graph
 
-for row in range(end[0] + 1):
-    for col in range(end[1] + 1):
-        if [row, col] in data:
+
+low = 0
+high = len(data) - 1
+mid = 0
+
+while low <= high:
+    mid = (high + low) // 2
+    graph_data = data[:mid]
+    graph = generate_graph(graph_data)
+
+    distances = {node: float("inf") for node in graph.keys()}
+    distances[start] = 0
+
+    pq = [(0, start)]
+    heapify(pq)
+    visited = set()
+
+    while pq:
+        distance, node = heappop(pq)
+        if node in visited:
             continue
-        adjs = []
-        if row - 1 >= 0 and [row - 1, col] not in data:
-            adjs.append((row - 1, col))
-        if row + 1 <= end[0] and [row + 1, col] not in data:
-            adjs.append((row + 1, col))
-        if col + 1 <= end[1] and [row, col + 1] not in data:
-            adjs.append((row, col + 1))
-        if col - 1 >= 0 and [row, col - 1] not in data:
-            adjs.append((row, col - 1))
-        graph[(row, col)] = adjs
+        visited.add(node)
 
-distances = {node: float("inf") for node in graph.keys()}
-distances[start] = 0
+        for adj in graph[node]:
+            temp_distance = distance + 1
+            if temp_distance < distances[adj]:
+                distances[adj] = temp_distance
+                heappush(pq, (temp_distance, adj))
 
-pq = [(0, start)]
-heapify(pq)
-visited = set()
-
-while pq:
-    distance, node = heappop(pq)
-    if node in visited:
-        continue
-    visited.add(node)
-
-    for adj in graph[node]:
-        temp_distance = distance + 1
-        if temp_distance < distances[adj]:
-            distances[adj] = temp_distance
-            heappush(pq, (temp_distance, adj))
-
-print(distances[end])
+    if distances[end] != float("inf"):
+        # solvable, go up
+        low = mid + 1
+    elif distances[end] == float("inf"):
+        high = mid - 1
 
 
-# X,Y
-# X => distance from left edge
-# Y => distance from top
-
-start = (0, 0)
-end = (70, 70)
+print(data[mid])
