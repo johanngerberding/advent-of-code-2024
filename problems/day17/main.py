@@ -86,6 +86,8 @@ while True:
     registers = [A, 0, 0]
     instruction_pointer = 0
     output = []
+    if A % 100000 == 0:
+        print(f"iteration {A}")
 
 
 # while instruction_pointer < len(program):
